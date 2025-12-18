@@ -1,127 +1,188 @@
 # SHL Assessment Recommender System
 
-A Retrieval-Augmented Generation (RAG) application designed to intelligently recommend SHL assessments based on user queries. This system combines semantic vector search with Google's Gemini LLM to provide context-aware, accurate recommendations.
+A **Retrieval-Augmented Generation (RAG)** application designed to intelligently recommend **SHL assessments** based on user queries. The system combines **semantic vector search** with **Google’s Gemini LLM** to deliver context-aware, accurate, and explainable assessment recommendations.
 
-## Features
+This project is built with a production-oriented mindset, focusing on clean architecture, evaluation, and fallback reliability.
 
-*   **Intelligent Search**: Uses `SentenceTransformers` (`all-MiniLM-L6-v2`) for semantic search, understanding user intent beyond simple keywords.
-*   **AI-Powered Recommendations**: Integrates **Google Gemini 1.5 Flash** to generate natural language explanations for recommendations.
-*   **Robust Data Pipeline**: Handles JSON/CSV/Excel inputs, normalizes data, and extracts metadata (like duration) from unstructured text.
-*   **Hybrid Output**: Provides both human-readable text summaries and structured JSON for API integration.
-*   **Evaluation Module**: Includes tools to calculate **Recall@K** metrics to verify retrieval accuracy.
-*   **Resilience**: Features a fallback mechanism to return structured results even if the LLM is unavailable.
-<<<<<<< HEAD
-## 🏗️ System Architecture
+---
 
-```mermaid
-graph TD
-    User([User Query]) --> RAG[RAG Engine]
-    
-    subgraph "Data Ingestion"
-        Raw[Raw Data (JSON/CSV)] -->|Load & Clean| Ingest[Ingestion Module]
-        Ingest -->|Generate Vectors| EmbedModel[Sentence Transformer]
-        EmbedModel -->|Store| FAISS[(FAISS Vector DB)]
-    end
-    
-    subgraph "RAG Pipeline"
-        RAG -->|1. Embed Query| EmbedModel
-        RAG -->|2. Similarity Search| FAISS
-        FAISS -->|3. Retrieve Top-K| RAG
-        RAG -->|4. Construct Context| Prompt[Prompt Template]
-        Prompt -->|5. Generate| LLM[Google Gemini LLM]
-    end
-    
-    LLM -->|6. Response| RAG
-    RAG --> Output([Final Output])
-    
-    Output -.-> JSON[Structured JSON]
-    Output -.-> Text[Human-Readable Text]
-```
-=======
+## 🚀 Features
 
->>>>>>> aebcda0f6a37e1ea3572cfa25994c1a88949f096
-## Project Structure
+* **Intelligent Semantic Search**
+  Uses **SentenceTransformers (all-MiniLM-L6-v2)** to understand user intent beyond simple keyword matching.
+
+* **AI-Powered Recommendations**
+  Integrates **Google Gemini 1.5 Flash** to generate natural-language explanations for why specific assessments are recommended.
+
+* **Robust Data Pipeline**
+
+  * Supports **JSON, CSV, and Excel** input formats
+  * Automatically normalizes column names
+  * Extracts metadata (e.g., duration) from unstructured text using regex
+
+* **Hybrid Output System**
+
+  * **Human-readable** formatted summaries for end users
+  * **Machine-readable** structured JSON output for API or downstream integration
+
+* **Evaluation Module**
+  Built-in tools to calculate **Recall@K** metrics for validating retrieval accuracy using a known-item search methodology.
+
+* **Resilient Design**
+  Includes a fallback mechanism that returns structured semantic search results even if the LLM is unavailable or rate-limited.
+
+---
+
+## 🧠 System Architecture (High-Level)
+
+1. **Ingestion Layer**
+   Loads and cleans the SHL product catalog and creates a combined text field for embedding.
+
+2. **Embedding & Vector Store**
+   Converts assessment text into dense vectors using SentenceTransformers and stores them in **FAISS** for fast similarity search.
+
+3. **RAG Engine**
+   Retrieves the most relevant assessments and enriches the prompt before sending it to the Gemini LLM for final response generation.
+
+4. **Evaluation Module**
+   Measures retrieval quality using Recall@K and exports evaluation results.
+
+---
+
+## 📁 Project Structure
 
 ```
 shl/
 ├── data/                   # Data storage
-│   ├── shl_products.json   # Source catalog
-│   └── faiss_index/        # Vector database index
-├── outputs/                # Generated results (JSON/CSV)
+│   ├── shl_products.json   # Source assessment catalog
+│   └── faiss_index/        # FAISS vector index
+├── outputs/                # Generated outputs (JSON / CSV)
 ├── src/                    # Source code
-│   ├── config.py           # Configuration settings
-│   ├── embeddings/         # Embedding model logic
+│   ├── config.py           # Global configuration
+│   ├── embeddings/         # Embedding logic
 │   ├── evaluation/         # Recall@K evaluation scripts
 │   ├── ingestion/          # Data loading and cleaning
-│   └── rag/                # Main RAG engine
+│   └── rag/                # Core RAG engine
 ├── requirements.txt        # Python dependencies
 └── .env                    # Environment variables (API keys)
 ```
 
-<<<<<<< HEAD
-## 🛠️ Installation
-=======
-## Installation
->>>>>>> aebcda0f6a37e1ea3572cfa25994c1a88949f096
+---
 
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/yashmishra1234567890/SHL.git
-    cd SHL
-    ```
+## ⚙️ Installation & Setup
 
-2.  **Create and activate a virtual environment:**
-    ```bash
-    python -m venv .venv
-    # Windows
-    .venv\Scripts\activate
-    # Mac/Linux
-    source .venv/bin/activate
-    ```
+### 1️⃣ Clone the Repository
 
-3.  **Install dependencies:**
-    ```bash
-    pip install -r requirements.txt
-    ```
+```bash
+git clone https://github.com/yashmishra1234567890/SHL.git
+cd SHL
+```
 
-4.  **Set up Environment Variables:**
-    Create a `.env` file in the root directory and add your Google Gemini API key:
-    ```env
-    GEMINI_API_KEY=your_api_key_here
-    ```
+### 2️⃣ Create & Activate Virtual Environment
 
-## Usage
+```bash
+python -m venv .venv
+```
 
-### Running the Recommendation Engine
-To test the recommendation engine directly:
+**Windows**
+
+```bash
+.venv\Scripts\activate
+```
+
+**Mac / Linux**
+
+```bash
+source .venv/bin/activate
+```
+
+### 3️⃣ Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4️⃣ Configure Environment Variables
+
+Create a `.env` file in the root directory:
+
+```env
+GEMINI_API_KEY=your_api_key_here
+```
+
+---
+
+## ▶️ Usage
+
+### 🔹 Run the Recommendation Engine
+
+To test the RAG pipeline with a sample query:
 
 ```bash
 python src/rag/rag_engine.py
 ```
-*This will run a test query defined in the `__main__` block of the file.*
 
-### Running Evaluations
-To evaluate the retrieval performance (Recall@K):
+This executes a test query defined in the `__main__` block and outputs:
+
+* A human-readable recommendation summary
+* A structured JSON response
+
+---
+
+### 🔹 Run Retrieval Evaluation (Recall@K)
+
+To evaluate semantic search performance:
 
 ```bash
 python src/evaluation/run_eval.py
 ```
-*Results will be saved to `outputs/evaluation_results.csv`.*
 
-## Configuration
+Evaluation results will be saved to:
 
-Key settings can be modified in `src/config.py`:
+```
+outputs/evaluation_results.csv
+```
 
-*   `CATALOG_PATH`: Path to the input data file.
-*   `TOP_K`: Number of assessments to retrieve (default: 10).
-*   `EMBEDDING_MODEL`: Model used for vectorization.
-*   `GEMINI_MODEL`: LLM version used for generation.
+---
 
-## Tech Stack
+## ⚙️ Configuration
 
-*   **Language**: Python 3.12
-*   **Orchestration**: LangChain
-*   **Vector Store**: FAISS
-*   **LLM**: Google Gemini 1.5 Flash
-*   **Embeddings**: SentenceTransformers (HuggingFace)
-*   **Data Processing**: Pandas
+Key configuration options can be modified in `src/config.py`:
+
+* `CATALOG_PATH` – Path to the SHL catalog file
+* `TOP_K` – Number of assessments to retrieve (default: 10)
+* `EMBEDDING_MODEL` – SentenceTransformer model name
+* `GEMINI_MODEL` – Gemini LLM version used for generation
+
+---
+
+## 🧪 Evaluation Methodology
+
+The system uses **Recall@K** to evaluate retrieval accuracy:
+
+* Measures whether the correct assessment appears in the top **K** retrieved results
+* Suitable for known-item and recommendation-style search systems
+* Helps validate embedding quality and retrieval logic
+
+---
+
+## 🛠 Tech Stack
+
+* **Language:** Python 3.12
+* **Orchestration:** LangChain
+* **Vector Database:** FAISS
+* **LLM:** Google Gemini 1.5 Flash
+* **Embeddings:** SentenceTransformers (HuggingFace)
+* **Data Processing:** Pandas
+
+---
+
+## 📌 Use Cases
+
+* Automated SHL assessment recommendation from job descriptions
+* HR-tech and recruitment platforms
+* Skill-based assessment discovery systems
+* GenAI-powered search and recommendation demos
+
+
+
