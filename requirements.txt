@@ -1,0 +1,12 @@
+google-generativeai
+python-dotenv
+pandas
+numpy
+faiss-cpu
+sentence-transformers
+fastapi
+uvicorn
+streamlit
+langchain
+langchain-community
+langchain-google-genai

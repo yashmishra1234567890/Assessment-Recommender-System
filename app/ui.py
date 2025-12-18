@@ -1,5 +1,11 @@
 import streamlit as st
-import requests
+import sys
+import os
+
+# Add project root to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from src.rag.rag_engine import AssessmentRecommendationEngine
 
 st.title("🧠 SHL GenAI Assessment Recommendation")
 
@@ -8,14 +14,39 @@ query = st.text_area("Enter Job Description")
 import pandas as pd
 import plotly.express as px
 
+@st.cache_resource
+def get_engine():
+    return AssessmentRecommendationEngine()
+
 if st.button("Recommend"):
     try:
-        response = requests.post(
-            "http://localhost:8080/recommend",
-            json={"query": query}
-        )
-        response.raise_for_status()
-        res = response.json()
+        engine = get_engine()
+        
+        # Get recommendations directly from the engine
+        explanation = engine.recommend(query)
+        docs = engine.search(query, k=10)
+        
+        results = []
+        for doc in docs:
+            meta = doc.metadata
+            test_type = meta.get("test_type", "")
+            if isinstance(test_type, str):
+                test_type = test_type.split(",")
+                
+            results.append({
+                "url": meta.get("url", ""),
+                "name": meta.get("name", ""),
+                "description": meta.get("description", ""),
+                "test_type": test_type,
+                "duration": meta.get("duration", 0),
+                "remote_support": meta.get("remote_support", "Yes"),
+                "adaptive_support": meta.get("adaptive_support", "No")
+            })
+            
+        res = {
+            "recommended_assessments": results,
+            "explanation": explanation
+        }
 
         st.subheader("Recommended Assessments")
         
@@ -74,5 +105,3 @@ if st.button("Recommend"):
         st.text(f"Raw Response: {response.text}")
     except Exception as e:
         st.error(f"An error occurred: {e}")
-#to run the app, use the command:
-# streamlit run app/ui.py
