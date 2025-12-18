@@ -1,0 +1,8 @@
+.env
+__pycache__/
+*.pyc
+test.py
+.venv/
+outputs/
+data/faiss_index/
+.vscode/
