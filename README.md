@@ -10,6 +10,7 @@ A Retrieval-Augmented Generation (RAG) application designed to intelligently rec
 *   **Hybrid Output**: Provides both human-readable text summaries and structured JSON for API integration.
 *   **Evaluation Module**: Includes tools to calculate **Recall@K** metrics to verify retrieval accuracy.
 *   **Resilience**: Features a fallback mechanism to return structured results even if the LLM is unavailable.
+<<<<<<< HEAD
 ## 🏗️ System Architecture
 
 ```mermaid
@@ -36,6 +37,9 @@ graph TD
     Output -.-> JSON[Structured JSON]
     Output -.-> Text[Human-Readable Text]
 ```
+=======
+
+>>>>>>> aebcda0f6a37e1ea3572cfa25994c1a88949f096
 ## Project Structure
 
 ```
@@ -54,7 +58,11 @@ shl/
 └── .env                    # Environment variables (API keys)
 ```
 
+<<<<<<< HEAD
 ## 🛠️ Installation
+=======
+## Installation
+>>>>>>> aebcda0f6a37e1ea3572cfa25994c1a88949f096
 
 1.  **Clone the repository:**
     ```bash
