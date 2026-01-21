@@ -1,4 +1,4 @@
-# SHL Assessment Recommender System
+# Assessment Recommender System
 
 A **Retrieval-Augmented Generation (RAG)** application designed to intelligently recommend **SHL assessments** based on user queries. The system combines **semantic vector search** with **Google’s Gemini LLM** to deliver context-aware, accurate, and explainable assessment recommendations.
 
