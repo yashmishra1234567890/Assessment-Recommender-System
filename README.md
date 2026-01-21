@@ -24,7 +24,7 @@ A high-performance **Retrieval-Augmented Generation (RAG)** system that intellig
 High-level overview of the ingestion, embedding, retrieval, and LLM augmentation layers.
 
 <p align="center">
-<img src="images/data_flow.png" alt="System Architecture" width="800">
+<img src="images/data flow.png" alt="System Architecture" width="800">
 </p>
 
 ### 🔹 Streamlit Web Interface
