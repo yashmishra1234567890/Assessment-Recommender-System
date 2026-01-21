@@ -1,70 +1,130 @@
-# Assessment Recommender System
+# Assessment Recommender System (RAG-Based)
 
-A **Retrieval-Augmented Generation (RAG)** application designed to intelligently recommend **SHL assessments** based on user queries. The system combines **semantic vector search** with **Google’s Gemini LLM** to deliver context-aware, accurate, and explainable assessment recommendations.
+A **Retrieval-Augmented Generation (RAG)** system that intelligently recommends **SHL assessments** from natural-language queries.
 
-This project is built with a production-oriented mindset, focusing on clean architecture, evaluation, and fallback reliability.
-* Live Demo:- https://jclg3riyas8cdlxmcdfcxs.streamlit.app/
+The system combines **semantic vector search (FAISS + SentenceTransformers)** with **Google Gemini LLM** to generate **context-aware, explainable, and reliable** recommendations.
+
+Built with a **production-oriented ML engineering mindset** — focusing on clean architecture, evaluation, and graceful failure handling.
+
+🔗 **Live Demo**
+👉 [https://jclg3riyas8cdlxmcdfcxs.streamlit.app/](https://jclg3riyas8cdlxmcdfcxs.streamlit.app/)
+
 ---
 
-## 🚀 Features
+## 🚀 Key Features
 
-* **Intelligent Semantic Search**
-  Uses **SentenceTransformers (all-MiniLM-L6-v2)** to understand user intent beyond simple keyword matching.
+### 🔍 Semantic Retrieval (Not Keyword Matching)
 
-* **AI-Powered Recommendations**
-  Integrates **Google Gemini 1.5 Flash** to generate natural-language explanations for why specific assessments are recommended.
+* Uses **SentenceTransformers (`all-MiniLM-L6-v2`)**
+* Understands intent beyond exact keyword overlap
+* Retrieves the most relevant assessments using **FAISS**
 
-* **Robust Data Pipeline**
+### 🤖 LLM-Augmented Recommendations
 
-  * Supports **JSON, CSV, and Excel** input formats
-  * Automatically normalizes column names
-  * Extracts metadata (e.g., duration) from unstructured text using regex
+* Integrates **Google Gemini 1.5 Flash**
+* Generates **natural-language explanations** describing *why* each assessment is recommended
 
-* **Hybrid Output System**
+### 🧱 Robust Data Ingestion Pipeline
 
-  * **Human-readable** formatted summaries for end users
-  * **Machine-readable** structured JSON output for API or downstream integration
+* Supports **JSON, CSV, and Excel**
+* Automatically normalizes column names
+* Extracts metadata (e.g., assessment duration) from unstructured text using **regex**
 
-* **Evaluation Module**
-  Built-in tools to calculate **Recall@K** metrics for validating retrieval accuracy using a known-item search methodology.
+### 🔄 Hybrid Output Design
 
-* **Resilient Design**
-  Includes a fallback mechanism that returns structured semantic search results even if the LLM is unavailable or rate-limited.
+* **Human-readable summaries** for end users
+* **Structured JSON output** for APIs or downstream systems
+
+### 🧪 Built-in Evaluation (Recall@K)
+
+* Measures retrieval accuracy using **Recall@K**
+* Validates embedding quality using known-item search
+* Outputs evaluation results for offline analysis
+
+### 🛡 Reliable Fallback Strategy
+
+* If the LLM is unavailable or rate-limited:
+
+  * The system still returns **structured semantic search results**
+* Ensures consistent behavior in production environments
+
+---
+
+## 📸 Screenshots & Demo
+
+### 🔹 Live Recommendation Flow
+
+Natural-language input → semantic retrieval → explainable recommendations.
+
+```md
+![Assessment Recommendation Demo](images/working_video.gif)
+```
+
+> ℹ️ Convert `working_video.mp4` → `.gif` for better GitHub autoplay support.
+
+---
+
+### 🔹 System Architecture (RAG Flow)
+
+```md
+![System Architecture](images/data_flow.png)
+```
+
+---
+
+### 🔹 Streamlit Web Interface
+
+```md
+![Web Interface](images/web_view.png)
+```
 
 ---
 
 ## 🧠 System Architecture (High-Level)
 
 1. **Ingestion Layer**
-   Loads and cleans the SHL product catalog and creates a combined text field for embedding.
+
+   * Loads SHL catalog
+   * Cleans and normalizes data
+   * Creates combined text fields for embedding
 
 2. **Embedding & Vector Store**
-   Converts assessment text into dense vectors using SentenceTransformers and stores them in **FAISS** for fast similarity search.
+
+   * Generates dense embeddings using SentenceTransformers
+   * Stores vectors in **FAISS** for fast similarity search
 
 3. **RAG Engine**
-   Retrieves the most relevant assessments and enriches the prompt before sending it to the Gemini LLM for final response generation.
+
+   * Retrieves top-K relevant assessments
+   * Enriches the prompt with retrieved context
+   * Sends it to **Gemini LLM** for explanation generation
 
 4. **Evaluation Module**
-   Measures retrieval quality using Recall@K and exports evaluation results.
+
+   * Computes **Recall@K**
+   * Exports results for analysis
 
 ---
 
 ## 📁 Project Structure
 
-```
+```bash
 shl/
-├── data/                   # Data storage
-│   ├── shl_products.json   # Source assessment catalog
-│   └── faiss_index/        # FAISS vector index
-├── outputs/                # Generated outputs (JSON / CSV)
-├── src/                    # Source code
-│   ├── config.py           # Global configuration
-│   ├── embeddings/         # Embedding logic
-│   ├── evaluation/         # Recall@K evaluation scripts
-│   ├── ingestion/          # Data loading and cleaning
-│   └── rag/                # Core RAG engine
-├── requirements.txt        # Python dependencies
-└── .env                    # Environment variables (API keys)
+├── data/
+│   ├── shl_products.json     # Source assessment catalog
+│   └── faiss_index/          # FAISS vector store
+├── outputs/
+│   ├── evaluation_results.csv
+│   └── recommendations.json
+├── src/
+│   ├── config.py             # Global configuration
+│   ├── embeddings/           # Embedding logic
+│   ├── ingestion/            # Data loading & cleaning
+│   ├── rag/                  # RAG engine
+│   └── evaluation/           # Recall@K evaluation
+├── images/                   # Screenshots & diagrams
+├── requirements.txt
+└── .env
 ```
 
 ---
@@ -104,7 +164,7 @@ pip install -r requirements.txt
 
 ### 4️⃣ Configure Environment Variables
 
-Create a `.env` file in the root directory:
+Create a `.env` file:
 
 ```env
 GEMINI_API_KEY=your_api_key_here
@@ -116,30 +176,26 @@ GEMINI_API_KEY=your_api_key_here
 
 ### 🔹 Run the Recommendation Engine
 
-To test the RAG pipeline with a sample query:
-
 ```bash
 python src/rag/rag_engine.py
 ```
 
-This executes a test query defined in the `__main__` block and outputs:
+Outputs:
 
-* A human-readable recommendation summary
-* A structured JSON response
+* Human-readable recommendation summary
+* Structured JSON output
 
 ---
 
-### 🔹 Run Retrieval Evaluation (Recall@K)
-
-To evaluate semantic search performance:
+### 🔹 Run Retrieval Evaluation
 
 ```bash
 python src/evaluation/run_eval.py
 ```
 
-Evaluation results will be saved to:
+Results saved to:
 
-```
+```bash
 outputs/evaluation_results.csv
 ```
 
@@ -147,33 +203,36 @@ outputs/evaluation_results.csv
 
 ## ⚙️ Configuration
 
-Key configuration options can be modified in `src/config.py`:
+Edit `src/config.py` to customize:
 
-* `CATALOG_PATH` – Path to the SHL catalog file
-* `TOP_K` – Number of assessments to retrieve (default: 10)
-* `EMBEDDING_MODEL` – SentenceTransformer model name
-* `GEMINI_MODEL` – Gemini LLM version used for generation
+* `CATALOG_PATH` – SHL catalog file path
+* `TOP_K` – Number of retrieved assessments
+* `EMBEDDING_MODEL` – SentenceTransformer model
+* `GEMINI_MODEL` – Gemini LLM version
 
 ---
 
 ## 🧪 Evaluation Methodology
 
-The system uses **Recall@K** to evaluate retrieval accuracy:
+* Uses **Recall@K** to measure retrieval performance
+* Checks whether the correct assessment appears in top-K results
+* Suitable for:
 
-* Measures whether the correct assessment appears in the top **K** retrieved results
-* Suitable for known-item and recommendation-style search systems
-* Helps validate embedding quality and retrieval logic
+  * Known-item search
+  * Recommendation systems
+  * RAG retrieval validation
 
 ---
 
 ## 🛠 Tech Stack
 
-* **Language:** Python 3.12
-* **Orchestration:** LangChain
-* **Vector Database:** FAISS
-* **LLM:** Google Gemini 1.5 Flash
-* **Embeddings:** SentenceTransformers (HuggingFace)
-* **Data Processing:** Pandas
+* **Python 3.12**
+* **LangChain**
+* **FAISS**
+* **SentenceTransformers (HuggingFace)**
+* **Google Gemini 1.5 Flash**
+* **Pandas**
+* **Streamlit**
 
 ---
 
@@ -181,9 +240,7 @@ The system uses **Recall@K** to evaluate retrieval accuracy:
 
 * Automated SHL assessment recommendation from job descriptions
 * HR-tech and recruitment platforms
-* Skill-based assessment discovery systems
-* GenAI-powered search and recommendation demos
+* Skill-based assessment discovery
+* GenAI-powered search & recommendation demos
 
-
-
-
+---
